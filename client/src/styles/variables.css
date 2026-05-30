@@ -1,0 +1,80 @@
+:root {
+  /* Typography */
+  --font-primary: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', var(--font-primary);
+
+  /* Shared / Static Color Tokens */
+  --color-primary-hsl: 239, 84%, 67%;    /* Indigo */
+  --color-secondary-hsl: 325, 78%, 66%;  /* Vibrant Magenta */
+  --color-success-hsl: 142, 71%, 45%;    /* Green */
+  --color-warning-hsl: 38, 92%, 50%;     /* Amber */
+  --color-danger-hsl: 0, 84%, 60%;       /* Crimson */
+
+  --color-primary: hsl(var(--color-primary-hsl));
+  --color-primary-light: hsl(var(--color-primary-hsl), 0.15);
+  --color-primary-dark: hsl(239, 84%, 55%);
+  --color-secondary: hsl(var(--color-secondary-hsl));
+  --color-secondary-light: hsl(var(--color-secondary-hsl), 0.15);
+  --color-success: hsl(var(--color-success-hsl));
+  --color-warning: hsl(var(--color-warning-hsl));
+  --color-danger: hsl(var(--color-danger-hsl));
+
+  /* Theme-specific tokens (Light Mode Default) */
+  --bg-body-hsl: 210, 20%, 98%;
+  --bg-card-hsl: 0, 0%, 100%;
+  --text-main-hsl: 224, 71%, 4%;
+  --text-muted-hsl: 215, 16%, 47%;
+  
+  --bg-body: hsl(var(--bg-body-hsl));
+  --bg-card: hsl(var(--bg-card-hsl));
+  --bg-card-hover: hsl(210, 20%, 96%);
+  --text-main: hsl(var(--text-main-hsl));
+  --text-muted: hsl(var(--text-muted-hsl));
+  
+  --border-color: rgba(0, 0, 0, 0.08);
+  --border-focus: var(--color-primary);
+  
+  /* Shadows & Glassmorphism */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  
+  --glass-bg: rgba(255, 255, 255, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.4);
+  --glass-blur: 12px;
+
+  /* Layout and Styling Helpers */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --transition-fast: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  --container-width: 1200px;
+}
+
+/* Dark Mode Tokens */
+body.dark {
+  --bg-body-hsl: 222, 47%, 11%;
+  --bg-card-hsl: 223, 47%, 14%;
+  --text-main-hsl: 210, 40%, 98%;
+  --text-muted-hsl: 215, 20%, 65%;
+  
+  --bg-body: hsl(var(--bg-body-hsl));
+  --bg-card: hsl(var(--bg-card-hsl));
+  --bg-card-hover: hsl(223, 47%, 18%);
+  --text-main: hsl(var(--text-main-hsl));
+  --text-muted: hsl(var(--text-muted-hsl));
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
+  
+  --glass-bg: rgba(15, 23, 42, 0.7);
+  --glass-border: rgba(255, 255, 255, 0.05);
+}

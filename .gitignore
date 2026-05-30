@@ -1,0 +1,22 @@
+# Dependency directories
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Production build output
+client/dist/
+
+# Environment variables and secrets
+.env
+server/.env
+
+# Local upload files
+server/uploads/*
+!server/uploads/.gitkeep
+
+# OS/IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
