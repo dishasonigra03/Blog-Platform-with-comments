@@ -340,6 +340,7 @@ const CommentSection = ({ postId, onCommentsUpdated }) => {
                     setReplyText('');
                     setActiveEditId(null);
                   }}
+                  className="comment-action-btn"
                   style={actionBtnStyle}
                   title="Reply"
                 >
@@ -354,6 +355,7 @@ const CommentSection = ({ postId, onCommentsUpdated }) => {
                     setEditText(commentItem.comment);
                     setActiveReplyId(null);
                   }}
+                  className="comment-action-btn"
                   style={actionBtnStyle}
                   title="Edit"
                 >
@@ -364,6 +366,7 @@ const CommentSection = ({ postId, onCommentsUpdated }) => {
               {(isOwner || isAdmin) && (
                 <button
                   onClick={() => handleDeleteComment(commentItem._id)}
+                  className="comment-action-btn"
                   style={{ ...actionBtnStyle, color: 'var(--color-danger)' }}
                   title="Delete"
                 >
@@ -683,11 +686,7 @@ const actionBtnStyle = {
   color: 'var(--text-muted)',
   padding: '4px 8px',
   borderRadius: '4px',
-  transition: 'all 0.2s',
-  ':hover': {
-    backgroundColor: 'var(--border-color)',
-    color: 'var(--text-main)'
-  }
+  transition: 'all 0.2s'
 };
 
 const commentBodyStyle = {
@@ -732,6 +731,10 @@ if (typeof document !== 'undefined') {
     }
     nav button:hover, div button:hover {
       background-color: var(--border-color);
+    }
+    .comment-action-btn:hover {
+      background-color: var(--border-color) !important;
+      color: var(--text-main) !important;
     }
   `;
   document.head.appendChild(styleSheet);

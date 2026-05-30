@@ -258,7 +258,7 @@ const BlogDetails = () => {
         {post.tags && post.tags.length > 0 && (
           <div style={tagsContainerStyle}>
             {post.tags.map((tag, idx) => (
-              <Link key={idx} to={`/?tag=${tag}`} style={tagBadgeStyle}>
+              <Link key={idx} to={`/?tag=${tag}`} className="tag-badge" style={tagBadgeStyle}>
                 #{tag}
               </Link>
             ))}
@@ -448,10 +448,7 @@ const tagBadgeStyle = {
   backgroundColor: 'var(--color-primary-light)',
   padding: '4px 12px',
   borderRadius: '6px',
-  transition: 'transform 0.2s',
-  ':hover': {
-    transform: 'translateY(-1px)'
-  }
+  transition: 'transform 0.2s'
 };
 
 const actionsBarStyle = {
@@ -526,6 +523,9 @@ if (typeof document !== 'undefined') {
   styleSheet.innerText = `
     a.card:hover h4 {
       color: var(--color-primary);
+    }
+    a.tag-badge:hover {
+      transform: translateY(-1px) !important;
     }
   `;
   document.head.appendChild(styleSheet);

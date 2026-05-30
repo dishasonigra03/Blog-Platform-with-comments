@@ -379,10 +379,10 @@ const Home = () => {
                 <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontStyle: 'italic' }}>No trending posts yet.</p>
               ) : (
                 trendingPosts.map((post, idx) => (
-                  <div key={post._id} style={trendingItemStyle}>
+                  <div key={post._id} className="trending-item" style={trendingItemStyle}>
                     <div style={trendingNumberStyle}>0{idx + 1}</div>
                     <div>
-                      <Link to={`/posts/${post.slug || post._id}`} style={trendingItemTitleStyle}>
+                      <Link to={`/posts/${post.slug || post._id}`} className="trending-title" style={trendingItemTitleStyle}>
                         {post.title}
                       </Link>
                       <div style={trendingMetaStyle}>
@@ -658,11 +658,7 @@ const trendingItemStyle = {
   gap: '1rem',
   alignItems: 'flex-start',
   paddingBottom: '0.8rem',
-  borderBottom: '1px solid var(--border-color)',
-  ':last-child': {
-    borderBottom: 'none',
-    paddingBottom: 0
-  }
+  borderBottom: '1px solid var(--border-color)'
 };
 
 const trendingNumberStyle = {
@@ -679,10 +675,7 @@ const trendingItemTitleStyle = {
   color: 'var(--text-main)',
   lineHeight: 1.3,
   display: 'block',
-  transition: 'color var(--transition-fast)',
-  ':hover': {
-    color: 'var(--color-primary)'
-  }
+  transition: 'color var(--transition-fast)'
 };
 
 const trendingMetaStyle = {
@@ -705,6 +698,13 @@ if (typeof document !== 'undefined') {
       .container > main { grid-column: 1 / 2; }
       .container > aside { grid-column: 2 / 3; display: flex !important; }
       nav > div.container, section > div.container { display: flex !important; }
+    }
+    .trending-item:last-child {
+      border-bottom: none !important;
+      padding-bottom: 0 !important;
+    }
+    a.trending-title:hover {
+      color: var(--color-primary) !important;
     }
   `;
   document.head.appendChild(styleSheet);
