@@ -9,7 +9,7 @@ const AdminPanel = () => {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'posts'
+  // activeTab state removed to stack panels vertically
   const [analytics, setAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
@@ -88,10 +88,16 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    if (activeTab === 'overview') fetchAnalytics();
-    if (activeTab === 'users') fetchUsers();
-    if (activeTab === 'posts') fetchPosts();
-  }, [activeTab, usersPage, postsPage]);
+    fetchAnalytics();
+  }, []);
+
+  useEffect(() => {
+    fetchUsers();
+  }, [usersPage]);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [postsPage]);
 
   // Update user role handler
   const handleToggleRole = async (targetUser) => {
@@ -183,122 +189,105 @@ const AdminPanel = () => {
         </p>
       </div>
 
-      {/* Tabs Row */}
-      <div style={tabsRowStyle}>
-        <button
-          onClick={() => setActiveTab('overview')}
-          style={activeTab === 'overview' ? activeTabBtnStyle : tabBtnStyle}
-        >
-          <BarChart3 size={16} /> Overview Analytics
-        </button>
-        <button
-          onClick={() => setActiveTab('users')}
-          style={activeTab === 'users' ? activeTabBtnStyle : tabBtnStyle}
-        >
-          <Users size={16} /> User Accounts
-        </button>
-        <button
-          onClick={() => setActiveTab('posts')}
-          style={activeTab === 'posts' ? activeTabBtnStyle : tabBtnStyle}
-        >
-          <BookOpen size={16} /> Moderate Posts
-        </button>
-      </div>
-
-      {/* Panels Body */}
-      <div style={{ marginTop: '1.5rem' }}>
+      {/* Panels Body - Stacked Vertically */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', marginTop: '2.5rem' }}>
         
         {/* Panel 1: Analytics Overview */}
-        {activeTab === 'overview' && (
-          <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-            {loadingAnalytics ? (
-              <div style={metricsGridStyle}>
-                {Array(4).fill(0).map((_, i) => (
-                  <div key={i} className="card shimmer" style={{ height: '110px' }} />
-                ))}
-              </div>
-            ) : analytics ? (
-              <>
-                {/* Counters Grid */}
-                <div style={metricsGridStyle}>
-                  <div className="card" style={metricsCardStyle}>
-                    <Users size={24} style={{ color: 'var(--color-primary)' }} />
-                    <span style={metricLabelStyle}>Total Accounts</span>
-                    <span style={metricNumberStyle}>{analytics.totalUsers}</span>
-                  </div>
-                  <div className="card" style={metricsCardStyle}>
-                    <BookOpen size={24} style={{ color: 'var(--color-secondary)' }} />
-                    <span style={metricLabelStyle}>Total Posts</span>
-                    <span style={metricNumberStyle}>{analytics.totalPosts}</span>
-                  </div>
-                  <div className="card" style={metricsCardStyle}>
-                    <MessageSquare size={24} style={{ color: 'var(--color-success)' }} />
-                    <span style={metricLabelStyle}>Comments Left</span>
-                    <span style={metricNumberStyle}>{analytics.totalComments}</span>
-                  </div>
-                  <div className="card" style={metricsCardStyle}>
-                    <Heart size={24} style={{ color: 'var(--color-danger)' }} />
-                    <span style={metricLabelStyle}>Likes Count</span>
-                    <span style={metricNumberStyle}>{analytics.totalLikes}</span>
-                  </div>
-                </div>
-
-                {/* Lists Columns (Recents Users & Recents Posts) */}
-                <div style={recentsGridStyle}>
-                  {/* Recents Users */}
-                  <div className="card" style={{ textAlign: 'left' }}>
-                    <h4 style={widgetTitleStyle}>Recent Registrations</h4>
-                    <div style={listContainerStyle}>
-                      {analytics.recentUsers.map(u => (
-                        <div key={u._id} style={listItemStyle}>
-                          {u.avatar ? (
-                            <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={listAvatarStyle} onError={(e) => { e.target.src = 'https://www.gravatar.com/avatar/?d=mp'; }} />
-                          ) : (
-                            <div style={listAvatarFallbackStyle}>{u.name[0].toUpperCase()}</div>
-                          )}
-                          <div>
-                            <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{u.name}</span>
-                            <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</span>
-                          </div>
-                          <span style={dateBadgeStyle}>{new Date(u.createdAt).toLocaleDateString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Recents Posts */}
-                  <div className="card" style={{ textAlign: 'left' }}>
-                    <h4 style={widgetTitleStyle}>Recent Stories</h4>
-                    <div style={listContainerStyle}>
-                      {analytics.recentPosts.map(p => (
-                        <div key={p._id} style={listItemStyle}>
-                          <div style={{ flex: 1 }}>
-                            <Link to={`/posts/${p.slug || p._id}`} style={listPostLinkStyle}>
-                              {p.title}
-                            </Link>
-                            <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                              by {p.author ? p.author.name : 'Unknown Author'} in <strong>{p.category}</strong>
-                            </span>
-                          </div>
-                          <span style={dateBadgeStyle}>{new Date(p.createdAt).toLocaleDateString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </>
-            ) : (
-              <p>Failed to load analytics.</p>
-            )}
+        <div className="animate-slide-up">
+          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
+              Platform Engagement Overview
+            </h3>
           </div>
-        )}
+          {loadingAnalytics ? (
+            <div style={metricsGridStyle}>
+              {Array(4).fill(0).map((_, i) => (
+                <div key={i} className="card shimmer" style={{ height: '110px' }} />
+              ))}
+            </div>
+          ) : analytics ? (
+            <>
+              {/* Counters Grid */}
+              <div style={metricsGridStyle}>
+                <div className="card" style={metricsCardStyle}>
+                  <Users size={24} style={{ color: 'var(--color-primary)' }} />
+                  <span style={metricLabelStyle}>Total Accounts</span>
+                  <span style={metricNumberStyle}>{analytics.totalUsers}</span>
+                </div>
+                <div className="card" style={metricsCardStyle}>
+                  <BookOpen size={24} style={{ color: 'var(--color-secondary)' }} />
+                  <span style={metricLabelStyle}>Total Posts</span>
+                  <span style={metricNumberStyle}>{analytics.totalPosts}</span>
+                </div>
+                <div className="card" style={metricsCardStyle}>
+                  <MessageSquare size={24} style={{ color: 'var(--color-success)' }} />
+                  <span style={metricLabelStyle}>Comments Left</span>
+                  <span style={metricNumberStyle}>{analytics.totalComments}</span>
+                </div>
+                <div className="card" style={metricsCardStyle}>
+                  <Heart size={24} style={{ color: 'var(--color-danger)' }} />
+                  <span style={metricLabelStyle}>Likes Count</span>
+                  <span style={metricNumberStyle}>{analytics.totalLikes}</span>
+                </div>
+              </div>
+
+              {/* Lists Columns (Recents Users & Recents Posts) */}
+              <div style={recentsGridStyle}>
+                {/* Recents Users */}
+                <div className="card" style={{ textAlign: 'left' }}>
+                  <h4 style={widgetTitleStyle}>Recent Registrations</h4>
+                  <div style={listContainerStyle}>
+                    {analytics.recentUsers.map(u => (
+                      <div key={u._id} style={listItemStyle}>
+                        {u.avatar ? (
+                          <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={listAvatarStyle} onError={(e) => { e.target.src = 'https://www.gravatar.com/avatar/?d=mp'; }} />
+                        ) : (
+                          <div style={listAvatarFallbackStyle}>{u.name[0].toUpperCase()}</div>
+                        )}
+                        <div>
+                          <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{u.name}</span>
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</span>
+                        </div>
+                        <span style={dateBadgeStyle}>{new Date(u.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Recents Posts */}
+                <div className="card" style={{ textAlign: 'left' }}>
+                  <h4 style={widgetTitleStyle}>Recent Stories</h4>
+                  <div style={listContainerStyle}>
+                    {analytics.recentPosts.map(p => (
+                      <div key={p._id} style={listItemStyle}>
+                        <div style={{ flex: 1 }}>
+                          <Link to={`/posts/${p.slug || p._id}`} style={listPostLinkStyle}>
+                            {p.title}
+                          </Link>
+                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                            by {p.author ? p.author.name : 'Unknown Author'} in <strong>{p.category}</strong>
+                          </span>
+                        </div>
+                        <span style={dateBadgeStyle}>{new Date(p.createdAt).toLocaleDateString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </>
+          ) : (
+            <p>Failed to load analytics.</p>
+          )}
+        </div>
 
         {/* Panel 2: User Moderation */}
-        {activeTab === 'users' && (
-          <div className="card animate-slide-up" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
-            <h3 style={{ padding: '0 1.5rem 1rem', fontSize: '1.2rem', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
+        <div className="animate-slide-up">
+          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
               User Accounts Database
             </h3>
+          </div>
+          <div className="card" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
             {loadingUsers ? (
               <div style={{ padding: '2rem' }}>
                 <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
@@ -374,14 +363,16 @@ const AdminPanel = () => {
               </>
             )}
           </div>
-        )}
+        </div>
 
         {/* Panel 3: Moderate Posts */}
-        {activeTab === 'posts' && (
-          <div className="card animate-slide-up" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
-            <h3 style={{ padding: '0 1.5rem 1rem', fontSize: '1.2rem', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
+        <div className="animate-slide-up">
+          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
+            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
               Moderated Blog Posts
             </h3>
+          </div>
+          <div className="card" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
             {loadingPosts ? (
               <div style={{ padding: '2rem' }}>
                 <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
@@ -449,7 +440,7 @@ const AdminPanel = () => {
               </>
             )}
           </div>
-        )}
+        </div>
 
       </div>
     </div>
