@@ -9,7 +9,7 @@ const AdminPanel = () => {
   const { addToast } = useToast();
   const navigate = useNavigate();
 
-  // activeTab state removed to stack panels vertically
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'users' | 'posts'
   const [analytics, setAnalytics] = useState(null);
   const [loadingAnalytics, setLoadingAnalytics] = useState(true);
 
@@ -88,16 +88,10 @@ const AdminPanel = () => {
   };
 
   useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  useEffect(() => {
-    fetchUsers();
-  }, [usersPage]);
-
-  useEffect(() => {
-    fetchPosts();
-  }, [postsPage]);
+    if (activeTab === 'overview') fetchAnalytics();
+    if (activeTab === 'users') fetchUsers();
+    if (activeTab === 'posts') fetchPosts();
+  }, [activeTab, usersPage, postsPage]);
 
   // Update user role handler
   const handleToggleRole = async (targetUser) => {
@@ -189,259 +183,277 @@ const AdminPanel = () => {
         </p>
       </div>
 
-      {/* Panels Body - Stacked Vertically */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '3rem', marginTop: '2.5rem' }}>
-        
-        {/* Panel 1: Analytics Overview */}
-        <div className="animate-slide-up">
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
-              Platform Engagement Overview
-            </h3>
-          </div>
-          {loadingAnalytics ? (
-            <div style={metricsGridStyle}>
-              {Array(4).fill(0).map((_, i) => (
-                <div key={i} className="card shimmer" style={{ height: '110px' }} />
-              ))}
-            </div>
-          ) : analytics ? (
-            <>
-              {/* Counters Grid */}
-              <div style={metricsGridStyle}>
-                <div className="card" style={metricsCardStyle}>
-                  <Users size={24} style={{ color: 'var(--color-primary)' }} />
-                  <span style={metricLabelStyle}>Total Accounts</span>
-                  <span style={metricNumberStyle}>{analytics.totalUsers}</span>
-                </div>
-                <div className="card" style={metricsCardStyle}>
-                  <BookOpen size={24} style={{ color: 'var(--color-secondary)' }} />
-                  <span style={metricLabelStyle}>Total Posts</span>
-                  <span style={metricNumberStyle}>{analytics.totalPosts}</span>
-                </div>
-                <div className="card" style={metricsCardStyle}>
-                  <MessageSquare size={24} style={{ color: 'var(--color-success)' }} />
-                  <span style={metricLabelStyle}>Comments Left</span>
-                  <span style={metricNumberStyle}>{analytics.totalComments}</span>
-                </div>
-                <div className="card" style={metricsCardStyle}>
-                  <Heart size={24} style={{ color: 'var(--color-danger)' }} />
-                  <span style={metricLabelStyle}>Likes Count</span>
-                  <span style={metricNumberStyle}>{analytics.totalLikes}</span>
-                </div>
-              </div>
+      {/* Admin Panel Grid Layout */}
+      <div className="admin-grid" style={adminGridStyle}>
+        {/* Left Side: Sidebar Tabs Navigation */}
+        <aside style={tabsRowStyle}>
+          <button
+            onClick={() => setActiveTab('overview')}
+            style={activeTab === 'overview' ? activeTabBtnStyle : tabBtnStyle}
+          >
+            <BarChart3 size={16} /> Overview Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('users')}
+            style={activeTab === 'users' ? activeTabBtnStyle : tabBtnStyle}
+          >
+            <Users size={16} /> User Accounts
+          </button>
+          <button
+            onClick={() => setActiveTab('posts')}
+            style={activeTab === 'posts' ? activeTabBtnStyle : tabBtnStyle}
+          >
+            <BookOpen size={16} /> Moderate Posts
+          </button>
+        </aside>
 
-              {/* Lists Columns (Recents Users & Recents Posts) */}
-              <div style={recentsGridStyle}>
-                {/* Recents Users */}
-                <div className="card" style={{ textAlign: 'left' }}>
-                  <h4 style={widgetTitleStyle}>Recent Registrations</h4>
-                  <div style={listContainerStyle}>
-                    {analytics.recentUsers.map(u => (
-                      <div key={u._id} style={listItemStyle}>
-                        {u.avatar ? (
-                          <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={listAvatarStyle} onError={(e) => { e.target.src = 'https://www.gravatar.com/avatar/?d=mp'; }} />
-                        ) : (
-                          <div style={listAvatarFallbackStyle}>{u.name[0].toUpperCase()}</div>
-                        )}
-                        <div>
-                          <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{u.name}</span>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</span>
-                        </div>
-                        <span style={dateBadgeStyle}>{new Date(u.createdAt).toLocaleDateString()}</span>
-                      </div>
-                    ))}
+        {/* Right Side: Tab Panel Content */}
+        <main style={contentPanelStyle}>
+          
+          {/* Tab 1: Analytics Overview */}
+          {activeTab === 'overview' && (
+            <div className="animate-slide-up" style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+              {loadingAnalytics ? (
+                <div style={metricsGridStyle}>
+                  {Array(4).fill(0).map((_, i) => (
+                    <div key={i} className="card shimmer" style={{ height: '110px' }} />
+                  ))}
+                </div>
+              ) : analytics ? (
+                <>
+                  {/* Counters Grid */}
+                  <div style={metricsGridStyle}>
+                    <div className="card" style={metricsCardStyle}>
+                      <Users size={24} style={{ color: 'var(--color-primary)' }} />
+                      <span style={metricLabelStyle}>Total Accounts</span>
+                      <span style={metricNumberStyle}>{analytics.totalUsers}</span>
+                    </div>
+                    <div className="card" style={metricsCardStyle}>
+                      <BookOpen size={24} style={{ color: 'var(--color-secondary)' }} />
+                      <span style={metricLabelStyle}>Total Posts</span>
+                      <span style={metricNumberStyle}>{analytics.totalPosts}</span>
+                    </div>
+                    <div className="card" style={metricsCardStyle}>
+                      <MessageSquare size={24} style={{ color: 'var(--color-success)' }} />
+                      <span style={metricLabelStyle}>Comments Left</span>
+                      <span style={metricNumberStyle}>{analytics.totalComments}</span>
+                    </div>
+                    <div className="card" style={metricsCardStyle}>
+                      <Heart size={24} style={{ color: 'var(--color-danger)' }} />
+                      <span style={metricLabelStyle}>Likes Count</span>
+                      <span style={metricNumberStyle}>{analytics.totalLikes}</span>
+                    </div>
                   </div>
-                </div>
 
-                {/* Recents Posts */}
-                <div className="card" style={{ textAlign: 'left' }}>
-                  <h4 style={widgetTitleStyle}>Recent Stories</h4>
-                  <div style={listContainerStyle}>
-                    {analytics.recentPosts.map(p => (
-                      <div key={p._id} style={listItemStyle}>
-                        <div style={{ flex: 1 }}>
-                          <Link to={`/posts/${p.slug || p._id}`} style={listPostLinkStyle}>
-                            {p.title}
-                          </Link>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                            by {p.author ? p.author.name : 'Unknown Author'} in <strong>{p.category}</strong>
-                          </span>
-                        </div>
-                        <span style={dateBadgeStyle}>{new Date(p.createdAt).toLocaleDateString()}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p>Failed to load analytics.</p>
-          )}
-        </div>
-
-        {/* Panel 2: User Moderation */}
-        <div className="animate-slide-up">
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
-              User Accounts Database
-            </h3>
-          </div>
-          <div className="card" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
-            {loadingUsers ? (
-              <div style={{ padding: '2rem' }}>
-                <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
-                <div className="shimmer" style={{ height: '40px' }} />
-              </div>
-            ) : (
-              <>
-                <table style={tableStyle}>
-                  <thead>
-                    <tr style={tableHeaderRowStyle}>
-                      <th style={thStyle}>User</th>
-                      <th style={thStyle}>Email</th>
-                      <th style={thStyle}>Role</th>
-                      <th style={thStyle}>Joined</th>
-                      <th style={thStyle}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {usersList.map(u => (
-                      <tr key={u._id} style={tableRowStyle}>
-                        <td style={tdStyle}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  {/* Lists Columns (Recents Users & Recents Posts) */}
+                  <div style={recentsGridStyle}>
+                    {/* Recents Users */}
+                    <div className="card" style={{ textAlign: 'left' }}>
+                      <h4 style={widgetTitleStyle}>Recent Registrations</h4>
+                      <div style={listContainerStyle}>
+                        {analytics.recentUsers.map(u => (
+                          <div key={u._id} style={listItemStyle}>
                             {u.avatar ? (
                               <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={listAvatarStyle} onError={(e) => { e.target.src = 'https://www.gravatar.com/avatar/?d=mp'; }} />
                             ) : (
                               <div style={listAvatarFallbackStyle}>{u.name[0].toUpperCase()}</div>
                             )}
-                            <span style={{ fontWeight: 600 }}>{u.name}</span>
+                            <div>
+                              <span style={{ fontWeight: 700, fontSize: '0.9rem', color: 'var(--text-main)' }}>{u.name}</span>
+                              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)' }}>{u.email}</span>
+                            </div>
+                            <span style={dateBadgeStyle}>{new Date(u.createdAt).toLocaleDateString()}</span>
                           </div>
-                        </td>
-                        <td style={tdStyle}>{u.email}</td>
-                        <td style={tdStyle}>
-                          <span style={u.role === 'admin' ? adminRoleStyle : userRoleStyle}>
-                            {u.role === 'admin' ? <Award size={12} /> : <User size={12} />} {u.role}
-                          </span>
-                        </td>
-                        <td style={tdStyle}>{new Date(u.createdAt).toLocaleDateString()}</td>
-                        <td style={tdStyle}>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <button
-                              onClick={() => handleToggleRole(u)}
-                              disabled={u._id === user._id}
-                              className="btn btn-secondary"
-                              style={roleBtnStyle}
-                              title="Toggle admin privilege"
-                            >
-                              <UserCheck size={12} /> Toggle Role
-                            </button>
-                            <button
-                              onClick={() => handleDeleteUser(u)}
-                              disabled={u._id === user._id}
-                              className="btn btn-danger"
-                              style={{ padding: '4px 8px', borderRadius: '4px' }}
-                              title="Delete account"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                        ))}
+                      </div>
+                    </div>
 
-                {/* Pagination */}
-                {totalUsersPages > 1 && (
-                  <div style={tablePaginationStyle}>
-                    <button disabled={usersPage === 1} onClick={() => setUsersPage(prev => Math.max(1, prev - 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Prev</button>
-                    <span style={{ fontSize: '0.85rem' }}>Page {usersPage} of {totalUsersPages}</span>
-                    <button disabled={usersPage === totalUsersPages} onClick={() => setUsersPage(prev => Math.min(totalUsersPages, prev + 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Next</button>
+                    {/* Recents Posts */}
+                    <div className="card" style={{ textAlign: 'left' }}>
+                      <h4 style={widgetTitleStyle}>Recent Stories</h4>
+                      <div style={listContainerStyle}>
+                        {analytics.recentPosts.map(p => (
+                          <div key={p._id} style={listItemStyle}>
+                            <div style={{ flex: 1 }}>
+                              <Link to={`/posts/${p.slug || p._id}`} style={listPostLinkStyle}>
+                                {p.title}
+                              </Link>
+                              <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                by {p.author ? p.author.name : 'Unknown Author'} in <strong>{p.category}</strong>
+                              </span>
+                            </div>
+                            <span style={dateBadgeStyle}>{new Date(p.createdAt).toLocaleDateString()}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                   </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+                </>
+              ) : (
+                <p>Failed to load analytics.</p>
+              )}
+            </div>
+          )}
 
-        {/* Panel 3: Moderate Posts */}
-        <div className="animate-slide-up">
-          <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '0.75rem', marginBottom: '1.5rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 700, textAlign: 'left' }}>
-              Moderated Blog Posts
-            </h3>
-          </div>
-          <div className="card" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
-            {loadingPosts ? (
-              <div style={{ padding: '2rem' }}>
-                <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
-                <div className="shimmer" style={{ height: '40px' }} />
-              </div>
-            ) : (
-              <>
-                <table style={tableStyle}>
-                  <thead>
-                    <tr style={tableHeaderRowStyle}>
-                      <th style={thStyle}>Post Title</th>
-                      <th style={thStyle}>Category</th>
-                      <th style={thStyle}>Likes</th>
-                      <th style={thStyle}>Published</th>
-                      <th style={thStyle}>Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {postsList.map(p => (
-                      <tr key={p._id} style={tableRowStyle}>
-                        <td style={tdStyle}>
-                          <Link to={`/posts/${p.slug || p._id}`} style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
-                            {p.title}
-                          </Link>
-                          <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
-                            by {p.author ? p.author.name : 'Unknown Author'}
-                          </span>
-                        </td>
-                        <td style={tdStyle}><span className="badge">{p.category}</span></td>
-                        <td style={tdStyle}>{p.likes ? p.likes.length : 0}</td>
-                        <td style={tdStyle}>{new Date(p.createdAt).toLocaleDateString()}</td>
-                        <td style={tdStyle}>
-                          <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <Link
-                              to={`/write?edit=${p._id}`}
-                              className="btn btn-secondary"
-                              style={{ padding: '4px 8px', borderRadius: '4px' }}
-                              title="Edit post"
-                            >
-                              <Edit3 size={12} />
+          {/* Tab 2: User Moderation */}
+          {activeTab === 'users' && (
+            <div className="card animate-slide-up" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
+              <h3 style={{ padding: '0 1.5rem 1rem', fontSize: '1.2rem', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
+                User Accounts Database
+              </h3>
+              {loadingUsers ? (
+                <div style={{ padding: '2rem' }}>
+                  <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
+                  <div className="shimmer" style={{ height: '40px' }} />
+                </div>
+              ) : (
+                <>
+                  <table style={tableStyle}>
+                    <thead>
+                      <tr style={tableHeaderRowStyle}>
+                        <th style={thStyle}>User</th>
+                        <th style={thStyle}>Email</th>
+                        <th style={thStyle}>Role</th>
+                        <th style={thStyle}>Joined</th>
+                        <th style={thStyle}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {usersList.map(u => (
+                        <tr key={u._id} style={tableRowStyle}>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                              {u.avatar ? (
+                                <img src={`http://localhost:5000${u.avatar}`} alt={u.name} style={listAvatarStyle} onError={(e) => { e.target.src = 'https://www.gravatar.com/avatar/?d=mp'; }} />
+                              ) : (
+                                <div style={listAvatarFallbackStyle}>{u.name[0].toUpperCase()}</div>
+                              )}
+                              <span style={{ fontWeight: 600 }}>{u.name}</span>
+                            </div>
+                          </td>
+                          <td style={tdStyle}>{u.email}</td>
+                          <td style={tdStyle}>
+                            <span style={u.role === 'admin' ? adminRoleStyle : userRoleStyle}>
+                              {u.role === 'admin' ? <Award size={12} /> : <User size={12} />} {u.role}
+                            </span>
+                          </td>
+                          <td style={tdStyle}>{new Date(u.createdAt).toLocaleDateString()}</td>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <button
+                                onClick={() => handleToggleRole(u)}
+                                disabled={u._id === user._id}
+                                className="btn btn-secondary"
+                                style={roleBtnStyle}
+                                title="Toggle admin privilege"
+                              >
+                                <UserCheck size={12} /> Toggle Role
+                              </button>
+                              <button
+                                onClick={() => handleDeleteUser(u)}
+                                disabled={u._id === user._id}
+                                className="btn btn-danger"
+                                style={{ padding: '4px 8px', borderRadius: '4px' }}
+                                title="Delete account"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* Pagination */}
+                  {totalUsersPages > 1 && (
+                    <div style={tablePaginationStyle}>
+                      <button disabled={usersPage === 1} onClick={() => setUsersPage(prev => Math.max(1, prev - 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Prev</button>
+                      <span style={{ fontSize: '0.85rem' }}>Page {usersPage} of {totalUsersPages}</span>
+                      <button disabled={usersPage === totalUsersPages} onClick={() => setUsersPage(prev => Math.min(totalUsersPages, prev + 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Next</button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
+
+          {/* Tab 3: Moderate Posts */}
+          {activeTab === 'posts' && (
+            <div className="card animate-slide-up" style={{ padding: '1.5rem 0', overflowX: 'auto', textAlign: 'left' }}>
+              <h3 style={{ padding: '0 1.5rem 1rem', fontSize: '1.2rem', borderBottom: '1px solid var(--border-color)', fontWeight: 700 }}>
+                Moderated Blog Posts
+              </h3>
+              {loadingPosts ? (
+                <div style={{ padding: '2rem' }}>
+                  <div className="shimmer" style={{ height: '40px', marginBottom: '8px' }} />
+                  <div className="shimmer" style={{ height: '40px' }} />
+                </div>
+              ) : (
+                <>
+                  <table style={tableStyle}>
+                    <thead>
+                      <tr style={tableHeaderRowStyle}>
+                        <th style={thStyle}>Post Title</th>
+                        <th style={thStyle}>Category</th>
+                        <th style={thStyle}>Likes</th>
+                        <th style={thStyle}>Published</th>
+                        <th style={thStyle}>Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {postsList.map(p => (
+                        <tr key={p._id} style={tableRowStyle}>
+                          <td style={tdStyle}>
+                            <Link to={`/posts/${p.slug || p._id}`} style={{ fontWeight: 600, color: 'var(--color-primary)' }}>
+                              {p.title}
                             </Link>
-                            <button
-                              onClick={() => handleDeletePost(p._id)}
-                              className="btn btn-danger"
-                              style={{ padding: '4px 8px', borderRadius: '4px' }}
-                              title="Delete post"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                            <span style={{ display: 'block', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                              by {p.author ? p.author.name : 'Unknown Author'}
+                            </span>
+                          </td>
+                          <td style={tdStyle}><span className="badge">{p.category}</span></td>
+                          <td style={tdStyle}>{p.likes ? p.likes.length : 0}</td>
+                          <td style={tdStyle}>{new Date(p.createdAt).toLocaleDateString()}</td>
+                          <td style={tdStyle}>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                              <Link
+                                to={`/write?edit=${p._id}`}
+                                className="btn btn-secondary"
+                                style={{ padding: '4px 8px', borderRadius: '4px' }}
+                                title="Edit post"
+                              >
+                                <Edit3 size={12} />
+                              </Link>
+                              <button
+                                onClick={() => handleDeletePost(p._id)}
+                                className="btn btn-danger"
+                                style={{ padding: '4px 8px', borderRadius: '4px' }}
+                                title="Delete post"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
 
-                {/* Pagination */}
-                {totalPostsPages > 1 && (
-                  <div style={tablePaginationStyle}>
-                    <button disabled={postsPage === 1} onClick={() => setPostsPage(prev => Math.max(1, prev - 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Prev</button>
-                    <span style={{ fontSize: '0.85rem' }}>Page {postsPage} of {totalPostsPages}</span>
-                    <button disabled={postsPage === totalPostsPages} onClick={() => setPostsPage(prev => Math.min(totalPostsPages, prev + 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Next</button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </div>
+                  {/* Pagination */}
+                  {totalPostsPages > 1 && (
+                    <div style={tablePaginationStyle}>
+                      <button disabled={postsPage === 1} onClick={() => setPostsPage(prev => Math.max(1, prev - 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Prev</button>
+                      <span style={{ fontSize: '0.85rem' }}>Page {postsPage} of {totalPostsPages}</span>
+                      <button disabled={postsPage === totalPostsPages} onClick={() => setPostsPage(prev => Math.min(totalPostsPages, prev + 1))} className="btn btn-secondary" style={{ padding: '4px 8px' }}>Next</button>
+                    </div>
+                  )}
+                </>
+              )}
+            </div>
+          )}
 
+        </main>
       </div>
     </div>
   );
@@ -453,12 +465,24 @@ const panelHeaderStyle = {
   marginBottom: '1.5rem'
 };
 
+const adminGridStyle = {
+  display: 'grid',
+  gridTemplateColumns: '1fr',
+  gap: '2rem',
+  marginTop: '1.5rem',
+  alignItems: 'start'
+};
+
+const contentPanelStyle = {
+  minWidth: 0
+};
+
 const tabsRowStyle = {
   display: 'flex',
+  flexDirection: 'column',
   gap: '0.5rem',
-  borderBottom: '1px solid var(--border-color)',
-  paddingBottom: '0.5rem',
-  overflowX: 'auto'
+  borderBottom: 'none',
+  paddingBottom: 0
 };
 
 const tabBtnStyle = {
@@ -652,5 +676,18 @@ const tablePaginationStyle = {
   gap: '1rem',
   padding: '1.25rem 1.5rem 0'
 };
+
+if (typeof document !== 'undefined') {
+  const styleSheet = document.createElement("style");
+  styleSheet.type = "text/css";
+  styleSheet.innerText = `
+    @media (min-width: 768px) {
+      .admin-grid {
+        grid-template-columns: 240px 1fr !important;
+      }
+    }
+  `;
+  document.head.appendChild(styleSheet);
+}
 
 export default AdminPanel;
